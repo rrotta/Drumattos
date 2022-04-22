@@ -141,7 +141,7 @@ If !Empty(aFilsCalc)
 					AND L1_OPERADO <= %Exp:mv_par05%
 					AND SL1.%NotDel%
 					AND L4_FILIAL = %XFilial:SL4%
-					AND L4_DATA = L1_DTLIM
+					//AND L4_DATA = L1_DTLIM
 					AND L4_NUM = L1_NUM
 					AND SL4.%NotDel%
 					AND AE_FILIAL = %XFilial:SAE%
