@@ -117,8 +117,8 @@ If !Empty(aFilsCalc)
 					%table:SL1% SL1
 				WHERE
 					SL1.L1_FILIAL = %XFilial:SL1%
-					AND L1_EMISNF >= %Exp:Dtos(mv_par02)%
-					AND L1_EMISNF <= %Exp:Dtos(mv_par03)%
+					AND L1_DTLIM >= %Exp:Dtos(mv_par02)%
+					AND L1_DTLIM <= %Exp:Dtos(mv_par03)%
 					AND L1_OPERADO >= %Exp:mv_par04%
 					AND L1_OPERADO <= %Exp:mv_par05%
 					AND L1_FORMPG  = 'R$'
@@ -135,13 +135,13 @@ If !Empty(aFilsCalc)
 					%table:SAE% SAE
 				WHERE
 					SL1.L1_FILIAL = %XFilial:SL1%
-					AND L1_EMISNF >= %Exp:Dtos(mv_par02)%
-					AND L1_EMISNF <= %Exp:Dtos(mv_par03)%
+					AND L1_DTLIM >= %Exp:Dtos(mv_par02)%
+					AND L1_DTLIM <= %Exp:Dtos(mv_par03)%
 					AND L1_OPERADO >= %Exp:mv_par04%
 					AND L1_OPERADO <= %Exp:mv_par05%
 					AND SL1.%NotDel%
 					AND L4_FILIAL = %XFilial:SL4%
-					AND L4_DATA = L1_EMISNF
+					AND L4_DATA = L1_DTLIM
 					AND L4_NUM = L1_NUM
 					AND SL4.%NotDel%
 					AND AE_FILIAL = %XFilial:SAE%
@@ -191,8 +191,8 @@ If !Empty(aFilsCalc)
 					%table:SL1% SL1
 				WHERE
 					SL1.L1_FILIAL = %XFilial:SL1%
-					AND L1_EMISNF >= %Exp:Dtos(mv_par02)%
-					AND L1_EMISNF <= %Exp:Dtos(mv_par03)%
+					AND L1_DTLIM >= %Exp:Dtos(mv_par02)%
+					AND L1_DTLIM <= %Exp:Dtos(mv_par03)%
 					AND L1_OPERADO >= %Exp:mv_par04%
 					AND L1_OPERADO <= %Exp:mv_par05%
 					AND SL1.%NotDel%
@@ -207,8 +207,8 @@ If !Empty(aFilsCalc)
 					%table:SL2% SL2
 				WHERE
 					SL1.L1_FILIAL = %XFilial:SL1%
-					AND L1_EMISNF >= %Exp:Dtos(mv_par02)%
-					AND L1_EMISNF <= %Exp:Dtos(mv_par03)%
+					AND L1_DTLIM >= %Exp:Dtos(mv_par02)%
+					AND L1_DTLIM <= %Exp:Dtos(mv_par03)%
 					AND L1_OPERADO >= %Exp:mv_par04%
 					AND L1_OPERADO <= %Exp:mv_par05%
 					AND SL1.%NotDel%
