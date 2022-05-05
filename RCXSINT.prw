@@ -57,11 +57,11 @@ oSection1 := TRSection():New(oCabec,'Pagamentos')
 oSection1:SetTotalInLine(.F.)
 
 TRCell():New(oSection1,'LOCUNID'	,,"Pagamento" 				,/*Picture*/	,TAMSX3("AE_DESC")[1] + 2,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection1,'NCALCL'		,,"Calculado"+ENTER+"(1)" 	,cPictVl	    ,			,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection1,'NINFOR'		,,"Informado"+ENTER+"(2)"	,cPictVl	    ,			,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection1,'NDIFER'		,,"Diferença"+ENTER+"(2-1)"	,cPictVl	    ,			,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection1,'NCONFE'		,,"Conferido"+ENTER+"(3)"	,cPictVl	    ,			,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection1,'NDIFCONF'	,,"Diferenca"+ENTER+"(3-1)"	,cPictVl	    ,			,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection1,'NCALCL'		,,"Calculado"+ENTER+"(1)" 	,cPictVl	    ,TamSX3("E1_VALOR")[1]   ,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection1,'NINFOR'		,,"Informado"+ENTER+"(2)"	,cPictVl	    ,TamSX3("E1_VALOR")[1]   ,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection1,'NDIFER'		,,"Diferença"+ENTER+"(2-1)"	,cPictVl	    ,TamSX3("E1_VALOR")[1]   ,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection1,'NCONFE'		,,"Conferido"+ENTER+"(3)"	,cPictVl	    ,TamSX3("E1_VALOR")[1]   ,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection1,'NDIFCONF'	,,"Diferenca"+ENTER+"(3-1)"	,cPictVl	    ,TamSX3("E1_VALOR")[1]   ,/*lPixel*/,/*{|| code-block de impressao }*/)
 
 oSection2:=TRSection():New(oSection1,"Resumo",/*Ordem*/)
 //oSection2:SetLineStyle() //Define a impressao da secao em linha
