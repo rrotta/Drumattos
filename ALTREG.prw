@@ -120,7 +120,7 @@ Static Function RunProcB()
 		lAlter := .F.
 
 		DbSelectArea(cAlias)
-		&(cAlias)->(DbSetOrder(nIndice))
+		&(cAlias)->(DbSetOrder(Val(nIndice)))
 		&(cAlias)->(DbGoTop())
 		If  &(cAlias)->(DbSeek(FWxFilial(cAlias)+aReg[x][1][1])) 
 			
