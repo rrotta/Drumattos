@@ -40,10 +40,10 @@ Static Function sfSetCTD(mvModel)
 		DbSelectArea("CTD")
 		CTD->(DbSetOrder(1))
 
-		If !(CTD->(DbSeek(xFilial("CTD")+"F"+oModelSA2:GetValue('A2_COD')+oModelSA2:GetValue('A2_LOJA'))))
+		If !(CTD->(DbSeek(FWxFilial("CTD")+"F"+oModelSA2:GetValue('A2_COD')+oModelSA2:GetValue('A2_LOJA'))))
 
 			liRec	:=	RecLock("CTD",.T.)
-			CTD->CTD_FILIAL := xFilial("CTD") 
+			CTD->CTD_FILIAL := FWxFilial("CTD") 
 			CTD->CTD_ITEM	:= "F"+oModelSA2:GetValue('A2_COD')+oModelSA2:GetValue('A2_LOJA')
 			CTD->CTD_CLASSE := "2"          
 			CTD->CTD_DESC01 := oModelSA2:GetValue('A2_NOME')
@@ -52,18 +52,19 @@ Static Function sfSetCTD(mvModel)
 			CTD->CTD_ITLP 	:= "F"+oModelSA2:GetValue('A2_COD')+oModelSA2:GetValue('A2_LOJA')
 			CTD->(MsUnLock())  
 
+			/*
 			If liRec
 
 				DbSelectArea("SA2")
 				SA2->(DbSetOrder(1))
-				If SA2->(DBSeek(xFilial("SA2")+oModelSA2:GetValue('A2_COD')+oModelSA2:GetValue('A2_LOJA')))		
+				If SA2->(DBSeek(FWxFilial("SA2")+oModelSA2:GetValue('A2_COD')+oModelSA2:GetValue('A2_LOJA')))		
 					RecLock("SA2",.F.)
 					SA2->A2_XITEMCC := "F"+oModelSA2:GetValue('A2_COD')+oModelSA2:GetValue('A2_LOJA')
 					SA2->(MsUnLock())
 			
 				EndIf
 			EndIf
-
+			*/
 
 		EndIF
 	EndIf	
