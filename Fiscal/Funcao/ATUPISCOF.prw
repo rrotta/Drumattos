@@ -5,7 +5,7 @@ Funçao para recalcular o PIS e CONFINS a partir de uma planilha
 @type function
 @version 
 @author TOTVS Nordeste
-@since 12/07/2022
+@since 18/07/2022
 @return
 /*/
 User Function ATUPISCOF()
@@ -55,7 +55,7 @@ Ler arquivo .CSV
 @type function
 @version 
 @author TOTVS Nordeste
-@since 12/07/2022
+@since 18/07/2022
 @return 
 /*/
 
@@ -117,7 +117,7 @@ Faz alteração do registro
 @type function
 @version 
 @author TOTVS Nordeste
-@since 12/07/2022
+@since 18/07/2022
 @return 
 /*/
 
