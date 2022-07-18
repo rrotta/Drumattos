@@ -29,6 +29,9 @@ Private  lAutoErrNoFile := .T.
 	aAdd(aFields, {"PRODUTO", GetSx3Cache("FT_PRODUTO","X3_TIPO"), GetSx3Cache("FT_PRODUTO","X3_TAMANHO"), GetSx3Cache("FT_PRODUTO","X3_DECIMAL")})
 	aAdd(aFields, {"ALIQPIS", GetSx3Cache("FT_ALIQPIS","X3_TIPO"), GetSx3Cache("FT_ALIQPIS","X3_TAMANHO"), GetSx3Cache("FT_ALIQPIS","X3_DECIMAL")})
 	aAdd(aFields, {"ALIQCOF", GetSx3Cache("FT_ALIQCOF","X3_TIPO"), GetSx3Cache("FT_ALIQCOF","X3_TAMANHO"), GetSx3Cache("FT_ALIQCOF","X3_DECIMAL")})
+	aAdd(aFields, {"CSTPIS" , GetSx3Cache("FT_CSTPIS","X3_TIPO") , GetSx3Cache("FT_CSTPIS","X3_TAMANHO") , GetSx3Cache("FT_ALIQCOF","X3_DECIMAL")})
+	aAdd(aFields, {"CSTCOF" , GetSx3Cache("FT_CSTCOF","X3_TIPO") , GetSx3Cache("FT_CSTCOF","X3_TAMANHO") , GetSx3Cache("FT_ALIQCOF","X3_DECIMAL")})
+	
 
 	oTempTable:SetFields( aFields )
 	oTempTable:Create()
@@ -38,10 +41,11 @@ Private  lAutoErrNoFile := .T.
 
 	FWMsgRun(, {|oSay| RunProcA(oSay)}, "Aguarde...","Lendo Arquivo...")
 	
-	Processa( {|| RunProcB() },"Aguarde", "Gravando Alterações...",.F.)
-
-	FWAlertSuccess("Processo de alteraçao finalizado com sucesso...", "")
-
+	If LastRec() > 0
+		Processa( {|| RunProcB() },"Aguarde", "Gravando Alterações...",.F.)
+		FWAlertSuccess("Processo de alteraçao finalizado com sucesso...", "")
+	EndIf 
+	
 	oTempTable:Delete()
 
 Return Nil
@@ -58,13 +62,13 @@ Ler arquivo .CSV
 Static Function RunProcA(oSay)
 
 Local aRegAux := {} 
-Local cArq    := ".txt"
+Local cArq    := ".csv"
 Local cLinha  := ""
 Local cLog    := ""
 Local nAux    := 0
 	
 Private aErro   := {}
-Private cTipo   := "Database (*.txt) | *.txt | "
+Private cTipo   := "'Arquivo CSV|*.csv| Arquivo TXT|*.txt "
 
 	cArq := cGetFile(cTipo,"TOTVS - Alterar Registros",,"C:\TOTVS")
 	If !File(cArq)
@@ -97,6 +101,8 @@ Private cTipo   := "Database (*.txt) | *.txt | "
 					(cAlias)->PRODUTO := aRegAux[8]
 					(cAlias)->ALIQPIS := Val(aRegAux[9])
 					(cAlias)->ALIQCOF := Val(aRegAux[10])
+					(cAlias)->CSTPIS  := aRegAux[11]
+					(cAlias)->CSTCOF  := aRegAux[12]
 					(cAlias)->(DBCommit())
 
 			Endif
@@ -121,18 +127,13 @@ Local cQry     := ""
 Local cAreaQry := GetNextAlias()
 Local nAtual   := 0
 Local nValor   := 0
-Local nLinhas  := 0
+Local nLinhas  := LastRec()
 Local lAlter   := .F.
 
 	cQry := "SELECT * FROM " + cTableName
     DBUseArea(.T., "TOPCONN", TCGenQry(,,cQry), cAreaQry, .T., .T.)
     (cAreaQry)->(dbGoTop())
 
-	While !(cAreaQry)->(Eof()) 
-		nLinhas++ 
-		(cAreaQry)->(DBSkip())
-	EndDo
-	
 	ProcRegua(nLinhas)
 
 	DbSelectArea("SFT")
@@ -159,20 +160,19 @@ Local lAlter   := .F.
 						 (cAreaQry)->ITEM+;
 						 (cAreaQry)->PRODUTO)) 
 		   
-		   	If !Empty((cAreaQry)->ALIQPIS)
-
-			 nValor := SFT->FT_TOTAL 
+			 nValor := SFT->FT_TOTAL  //Pega o total do item
+				
 				RecLock("SFT", .F.)
 					
 					SFT->FT_BASEPIS := nValor
 					SFT->FT_BASECOF := nValor
-					SFT->FT_CSTPIS  := "01"
-					SFT->FT_CSTCOF  := "01"
+					SFT->FT_ALIQPIS := (cAreaQry)->ALIQPIS
+					SFT->FT_ALIQCOF := (cAreaQry)->ALIQCOF
 					SFT->FT_VALPIS  := ( nValor * (cAreaQry)->ALIQPIS/100 )
-					If !Empty((cAreaQry)->ALIQCOF)
-						SFT->FT_VALCOF  := ( nValor * (cAreaQry)->ALIQCOF/100 )
-					Endif
-					
+					SFT->FT_VALCOF  := ( nValor * (cAreaQry)->ALIQCOF/100 )
+					SFT->FT_CSTPIS  := (cAreaQry)->CSTPIS
+					SFT->FT_CSTCOF  := (cAreaQry)->CSTCOF
+
 					lAlter := .T.
 				
 				SFT->(MsUnlock())
@@ -181,7 +181,6 @@ Local lAlter   := .F.
 					FWAlertError("Erro na alteração do registros, linha do arquivo: "+cValToChar(nAtual),;
 								 "Erro RecLock")
 				EndIf
-		  	EndIf  
 
 		EndIf 
 	 
