@@ -25,6 +25,7 @@ Private  lAutoErrNoFile := .T.
 	aAdd(aFields, {"CLIENTE", GetSx3Cache("D2_CLIENTE","X3_TIPO"), GetSx3Cache("D2_CLIENTE","X3_TAMANHO"), GetSx3Cache("D2_CLIENTE","X3_DECIMAL")})
 	aAdd(aFields, {"LOJA"   , GetSx3Cache("D2_LOJA"   ,"X3_TIPO"), GetSx3Cache("D2_LOJA"   ,"X3_TAMANHO"), GetSx3Cache("D2_LOJA"   ,"X3_DECIMAL")})
 	aAdd(aFields, {"PRODUTO", GetSx3Cache("D2_COD"    ,"X3_TIPO"), GetSx3Cache("D2_COD"    ,"X3_TAMANHO"), GetSx3Cache("D2_COD"    ,"X3_DECIMAL")})
+	aAdd(aFields, {"ITEM"   , GetSx3Cache("D2_ITEM"   ,"X3_TIPO"), GetSx3Cache("D2_ITEM"   ,"X3_TAMANHO"), GetSx3Cache("D2_ITEM"   ,"X3_DECIMAL")})
 	aAdd(aFields, {"CFOP"   , GetSx3Cache("D2_CF"     ,"X3_TIPO"), GetSx3Cache("D2_CF"     ,"X3_TAMANHO"), GetSx3Cache("D2_CF"     ,"X3_DECIMAL")})
 	aAdd(aFields, {"CHAVE"  , GetSx3Cache("F2_CHVNFE" ,"X3_TIPO"), GetSx3Cache("F2_CHVNFE" ,"X3_TAMANHO"), GetSx3Cache("F2_CHVNFE" ,"X3_DECIMAL")})
 
@@ -92,8 +93,9 @@ Private cTipo   := "'Arquivo CSV|*.csv| Arquivo TXT|*.txt "
 					(cAlias)->CLIENTE := aRegAux[4]
 					(cAlias)->LOJA    := aRegAux[5]
 					(cAlias)->PRODUTO := aRegAux[6]
-					(cAlias)->CFOP    := aRegAux[7]
-					(cAlias)->CHAVE   := aRegAux[8]
+					(cAlias)->ITEM    := aRegAux[7]
+					(cAlias)->CFOP    := aRegAux[8]
+					(cAlias)->CHAVE   := aRegAux[9]
 					(cAlias)->(DBCommit())
 
 			Endif
@@ -141,26 +143,24 @@ Local lAlter   := .F.
 		lAlter := .F.
 			
 			SD2->(DbGoTop())
-		If  SD2->(DbSeek((cAreaQry)->FILIAL+;
-						 (cAreaQry)->NFISCAL+;
-						 (cAreaQry)->SERIE+;
-						 (cAreaQry)->CLIENTE+;
-						 (cAreaQry)->LOJA+;
-						 (cAreaQry)->PRODUTO)) 
-				
-				RecLock("SD2", .F.)
-					
+		If  SD2->(DbSeek(PADR((cAreaQry)->FILIAL,TamSX3("D2_FILIAL")[1])+;
+						 PADR((cAreaQry)->NFISCAL,TamSX3("D2_DOC")[1])+;
+						 PADR((cAreaQry)->SERIE,TamSX3("D2_SERIE")[1])+;
+						 PADR((cAreaQry)->CLIENTE,TamSX3("D2_CLIENTE")[1])+;
+						 PADR((cAreaQry)->LOJA,TamSX3("D2_LOJA")[1])+;
+						 PADR((cAreaQry)->PRODUTO,TamSX3("D2_COD")[1])+;
+						 PADR((cAreaQry)->ITEM,TamSX3("D2_ITEM")[1]))) 
+			
+				RecLock("SD2", .F.)					
 					SD2->D2_CF  := (cAreaQry)->CFOP
-
 					lAlter := .T.
-				
 				SD2->(MsUnlock())
 
 				If !lAlter
 					FWAlertError("Erro na alteração do registros, linha do arquivo: "+cValToChar(nAtual),;
 								 "Erro RecLock")
 				EndIf
-
+			
 		EndIf 
 	 
 		(cAreaQry)->(DBSkip())
