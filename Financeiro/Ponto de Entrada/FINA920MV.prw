@@ -77,9 +77,11 @@ If aParam <> NIL
 				End
 				lAtu := .F.
 				DbSelectArea("SE1")
-				DbSetOrder(27)
-				dbSeek(cCodFil+Dtos(dEmissao)+cParcela+Right(Alltrim(cCodNSUOri),9))
-				While !Eof() .and. Alltrim(cCodFil+Dtos(dEmissao)+cParcela+Right(Alltrim(cCodNSUOri),9)) == Alltrim(SE1->(E1_FILIAL+DTOS(E1_EMISSAO)+E1_PARCELA+E1_NSUTEF))
+				DbSetOrder(23)
+				//dbSeek(cCodFil+Dtos(dEmissao)+cParcela+Right(Alltrim(cCodNSUOri),9))
+				dbSeek(cCodFil+Dtos(dEmissao)+Right(Alltrim(cCodNSUOri),9))
+				//While !Eof() .and. Alltrim(cCodFil+Dtos(dEmissao)+cParcela+Right(Alltrim(cCodNSUOri),9)) == Alltrim(SE1->(E1_FILIAL+DTOS(E1_EMISSAO)+E1_PARCELA+E1_NSUTEF))
+				While !Eof() .and. Alltrim(cCodFil+Dtos(dEmissao)+Right(Alltrim(cCodNSUOri),9)) == Alltrim(SE1->(E1_FILIAL+DTOS(E1_EMISSAO)+E1_NSUTEF))	
 					If QtdComp(nVlLiq) == QtdComp(SE1->E1_VALOR)
 						RecLock("SE1", .F.)
 						Replace E1_NSUTEF with Right(Alltrim(cCodNSU),9)
