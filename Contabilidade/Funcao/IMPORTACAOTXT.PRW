@@ -5,7 +5,7 @@
 #include "fileio.ch"
 
 /*======================================================================
-== Programa  ³MARHOT01  ºAutor  ³TOTVS NE         º Data ³  17/08/15  ==
+== Programa  ³MARHOT01  ºAutor  ³TOTVS NE         º Data ³  23/05/23  ==
 ==--------------------------------------------------------------------==
 == Descrição ³Integração Protheus (Contabilidade).  			      ==
 ==           ³                                                        ==
@@ -40,7 +40,7 @@ Return
 
 /*
 ========================================================================
-== Programa  ³JOBPRMPT02  ºAutor  ³TOTVS NE         º Data ³ 17/09/14 ==
+== Programa  ³JOBPRMPT02  ºAutor  ³TOTVS NE         º Data ³ 23/05/23 ==
 ==--------------------------------------------------------------------==
 == Descrição ³Rotina de integração RM x Protheus. (Contabilidade)     ==
 ==           ³                                                        ==
@@ -83,11 +83,12 @@ User Function JOBMAR01(_cEmp)
 	Private nHdlPrv
 	Private cArquivo
 
-	cDiret	:= cGetFile("'Arquivo CSV|*.csv| Arquivo TXT|*.txt ","TOTVS - Selecione o Arquivo",,"C:\TOTVS",.T.,GETF_LOCALHARD+GETF_NETWORKDRIVE,.F.)
+	//cDiret	:= cGetFile("'Arquivo CSV|*.csv| Arquivo TXT|*.txt ","TOTVS - Selecione o Arquivo",,"C:\TOTVS",.T.,GETF_LOCALHARD+GETF_NETWORKDRIVE,.F.)
+	cDiret	:= TFileDialog( "Arquivo CSV (*.csv) | Arquivos texto (*.txt)" ,,,, .F., /*GETF_MULTISELECT*/ )
 	nHandle := FT_FUse(cDiret)
 
 	If nHandle == -1
-		MsgAlert("Erro de abertura. Código: " + STR(FERROR()))
+		MsgAlert("Operação Cancelada")
 		Return
 	EndIf
 
@@ -190,7 +191,7 @@ User Function JOBMAR01(_cEmp)
 	EndDo
 
 	If bGrvCT2
-		Processa({|| fnGrvCT2()}, "Gravando dados contabil.")
+		Processa({|| fnGrvCT2()}, "Gravando saldos contábeis.")
 		FT_FUSE()
 	EndIf
 
@@ -202,7 +203,7 @@ User Function JOBMAR01(_cEmp)
 	PutMv("MV_CONTBAT",cMV_CONTBAT)
 	PutMv("MV_NUMLIN",cMV_NUMLIN)
 
-	FWAlertSuccess("Gravação dos dados contábeis.","Processo finalizado.")
+	FWAlertSuccess("Gravação dos saldos contábeis.","Processo finalizado.")
 
 Return
 
