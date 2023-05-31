@@ -133,18 +133,19 @@ User Function JOBMAR01(_cEmp)
 			aRegAux := Separa(cTexto,";",.T.)
 
 			 RecLock("TRP",.T.)
-			  Replace TRP->LP	  With aRegAux[1]
-			  Replace TRP->DTLAN  With CToD(aRegAux[2])
-			  Replace TRP->DEBIT  With aRegAux[3]
-			  Replace TRP->CREDI  With aRegAux[4]
-			  Replace TRP->CCD    With aRegAux[5]
-			  Replace TRP->CCC    With aRegAux[6]
-			  Replace TRP->ICD    With aRegAux[7]
-			  Replace TRP->ICC    With aRegAux[8]
-			  Replace TRP->CLD    With aRegAux[9]
-			  Replace TRP->CLC    With aRegAux[10]
-			  Replace TRP->VALOR  With Val(StrTran(aRegAux[11], ",", "."))
-		      Replace TRP->HIST   With aRegAux[12]
+			  Replace TRP->FILIAL With aRegAux[1]
+			  Replace TRP->LP	  With aRegAux[2]
+			  Replace TRP->DTLAN  With CToD(aRegAux[3])
+			  Replace TRP->DEBIT  With aRegAux[4]
+			  Replace TRP->CREDI  With aRegAux[5]
+			  Replace TRP->CCD    With aRegAux[6]
+			  Replace TRP->CCC    With aRegAux[7]
+			  Replace TRP->ICD    With aRegAux[8]
+			  Replace TRP->ICC    With aRegAux[9]
+			  Replace TRP->CLD    With aRegAux[10]
+			  Replace TRP->CLC    With aRegAux[11]
+			  Replace TRP->VALOR  With Val(StrTran(aRegAux[12], ",", "."))
+		      Replace TRP->HIST   With aRegAux[13]
 			 MsUnlock()
 		EndIf 
 		FT_FSKIP()
@@ -214,39 +215,4 @@ Return
 Static Function fnGrvCT2()
 	RodaProva(nHdlPrv,nTotal)
 	cA100Incl(cArquivo,nHdlPrv,3,cLote,lDigita,.F.,.T.,dLancto)
-Return
-
-/*-----------------------------
---  Função: Criar Pergunta   --
---                           --
--------------------------------*/
-Static Function CriaPerg(cPerg)
-	Local _sAlias := Alias()
-	Local aRegs   := {}
-	Local i
-	Local j
-
-	dbSelectArea("SX1")
-	dbSetOrder(1)
-	cPerg := PADR(cPerg,10)
-
-	// Grupo/Ordem/Pergunta/Variavel/Tipo/Tamanho/Decimal/Presel/GSC/Valid/Var01/Def01/Cnt01/Var02/Def02/Cnt02/Var03/Def03/Cnt03/Var04/Def04/Cnt04/Var05/Def05/Cnt05
-	aAdd(aRegs,{cPerg,"01","Coligada    ?","","","mv_ch1","N",01,0,0,"G","","mv_par01","","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	aAdd(aRegs,{cPerg,"02","Numero Lote ?","","","mv_ch2","N",06,0,0,"G","","mv_par02","","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	aAdd(aRegs,{cPerg,"03","Operação    ?","","","mv_ch3","N",01,0,0,"C","","mv_par03","Contab. Lote","Contab. Lote","Contab. Lote","","",;
-		"Excluir Lote","Excluir Lote","Excluir Lote","","","","","","","","","","","","","","","","","","","","",""})
-
-	For i:=1 to Len(aRegs)
-		If !dbSeek(cPerg+aRegs[i,2])
-			RecLock("SX1",.T.)
-			For j:=1 to Len(aRegs[i])
-				If j <= Len(aRegs[i])
-					FieldPut(j,aRegs[i,j])
-				EndIf
-			Next
-			MsUnlock()
-		EndIf
-	Next
-
-	dbSelectArea(_sAlias)
 Return

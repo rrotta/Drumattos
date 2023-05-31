@@ -62,7 +62,7 @@ User Function UPDSL1(aParam)
        TMPSL1->(dbSkip())
       EndDo
 
-   // -- Deletar registros com situação de 'ER' e já processado, duplicidade
+  // -- Deletar registros com situação de 'ER' e já processado, duplicidade
   // -----------------------------------------------------------------------
    cQry := "Select SL1.R_E_C_N_O_ as RECNOSL1, SL2.R_E_C_N_O_ as RECNOSL2, SL4.R_E_C_N_O_ as RECNOSL4"
    cQry += "  from " + RetSqlName("SL1") + " SL1, " + RetSqlName("SL2") + " SL2, " + RetSqlName("SL4") + " SL4"
@@ -139,7 +139,42 @@ User Function UPDSL1(aParam)
    For nX := 1 To Len(aNomeArq)
        FErase(cRootPath + cBarras + "3lm_json" + cBarras + aNomeArq[nX])       // Deletar arquivo de controle
    Next  
-  // ------------------------------------------------
+
+  // -- Auditar o arquivo de log com a tabela de Nota para verificar
+  // -- se realmente gravou a CT-e
+  // ---------------------------------------------------------------
+   dbSelectArea("SZ1")
+   SZ1->(dbSetOrder(1))
+
+   cQry := "Select SZ1.R_E_C_N_O_ as RECNOSZ1"
+   cQry += "  from " + RetSqlName("SZ1") + " SZ1"
+   cQry += "   where SZ1.D_E_L_E_T_ <> '*'"
+   cQry += "     and SZ1.Z1_DATA between '" + DToS(dDataBase - 1) + "' and '" + DToS(dDataBase) + "'"
+   cQry += "     and SZ1.Z1_ROTINA = 'MATA116'"
+   cQry += "     and SZ1.Z1_STATUS = 'S'"
+   cQry += "     and not exists (Select SF1.R_E_C_N_O_ from " + RetSqlName("SF1") + " SF1"
+   cQry += "                        where SF1.D_E_L_E_T_ <> '*'"
+	cQry += "   			              and SF1.F1_FILIAL  = SZ1.Z1_FILDEST"
+	cQry += "  			                 and SF1.F1_DOC     = Substring(SZ1.Z1_DOCTO,22,9)"
+	cQry += "          			        and SF1.F1_SERIE   = Substring(SZ1.Z1_DOCTO,11,3)"
+	cQry += "  			                 and SF1.F1_FORNECE = Substring(SZ1.Z1_DOCTO,43,8)"
+	cQry += "			                 and SF1.F1_LOJA    = Substring(SZ1.Z1_DOCTO,57,4))"
+   cQry := ChangeQuery(cQry)
+   dbUseArea(.T.,"TOPCONN",TcGenQry(,,cQry),"QSZ1",.T.,.T.)
+
+   While ! QSZ1->(Eof())
+     SZ1->(dbGoto(QSZ1->RECNOSZ1))
+
+     Reclock("SZ1",.F.)
+       Replace SZ1->Z1_MENSAG with "AUDITORIA - Registro não encontrado na tabela de Notas, processe novamente."
+       Replace SZ1->Z1_STATUS with "E"
+     SZ1->(MsUnlock())
+
+     QSZ1->(dbSkip())
+   EndDo
+
+   QSZ1->(dbCloseArea())
+  // --------------------
 
    TCLink()
       cQry := " UPDATE " + RetSqlName("SL1") 

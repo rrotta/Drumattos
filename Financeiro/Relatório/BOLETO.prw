@@ -2151,7 +2151,6 @@ Return
 ==================================*/
 User Function fnEnvBol(pTitulos)
   Local nId    := 0
-  Local nId1   := 0
   Local nPos   := 0
   Local aFiles := Directory(cDirGer + "*.PDF","D")
   Local aNmArq := {}
@@ -2188,8 +2187,7 @@ User Function fnEnvBol(pTitulos)
   
   For nId := 1 To Len(aDados)
       cGerPDF := "bol_" + aDados[nId][01] + "_" + aDados[nId][07]
-                    
-      nPos := aScan(aNmArq, {|x| Substr(x,1,(TamSX3("A1_COD")[1] + 5 + TamSX3("A1_LOJA")[1])) == Upper(cGerPDF)})
+      nPos    := aScan(aNmArq, {|x| Upper(Substr(x,1,(TamSX3("A1_COD")[1] + 5 + TamSX3("A1_LOJA")[1]))) == Upper(cGerPDF)})
 
       If nPos > 0 
          oProcess := TWFProcess():New("000001","Envio de Boleto")
@@ -2208,14 +2206,10 @@ User Function fnEnvBol(pTitulos)
        //_user := Subs(cUsuario,7,15)
          oProcess:ClientName("Administrador")
 
-         For nId1 := 1 To Len(aNmArq)
-             If Substr(aNmArq[nId1],1,(TamSX3("A1_COD")[1] + 4)) == Upper(cGerPDF) 
-                __CopyFile(cDirGer + aNmArq[nId1], "\workflow\boleto_pdf\" + aNmArq[nId1])  // Copiar para pasta de Processado o arquivo já processado
+         __CopyFile(cDirGer + aNmArq[nPos], "\workflow\boleto_pdf\" + aNmArq[nPos])  // Copiar para pasta de Processado o arquivo já processado
 
-                oProcess:AttachFile("\workflow\boleto_pdf\" + aNmArq[nId1])
-                fErase(cDirGer + aNmArq[nId1])                               // Deletar da pasta de Recebido o arquivo processado
-             EndIf
-         Next
+         oProcess:AttachFile("\workflow\boleto_pdf\" + aNmArq[nPos])
+         fErase(cDirGer + aNmArq[nPos])                               // Deletar da pasta de Recebido o arquivo processado
              
          oProcess:cTo      := cEmail
          subj              := "Boleto(s)"
