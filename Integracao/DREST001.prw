@@ -293,6 +293,8 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
   Local cFile     := ""
   Local cFileCtr  := ""
   Local cArqJson  := ""
+  Local cDadosReq := ""
+  Local cCRLF		:= Chr(13) + Chr(10)
   Local dEmisNFe  := SToD("")
   Local dVencSE2  := SToD("")
   Local dAtual    := dDataBase 
@@ -522,6 +524,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
             Case cIDRot == "MATA030"
                  cTpRotina := "CLIENTE"
                  cDcRotina := ""
+                 cDadosReq := VarInfo("Dados: ",aCab)
 
                  If (nPos := aScan(aCab, {|x| x[01] == "A1_COD"})) > 0
                     cDcRotina += "Codigo " + AllTrim(aCab[nPos][02]) + " "
@@ -542,6 +545,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
             Case cIDRot == "MATA040"
                  cTpRotina := "VENDEDOR"
                  cDcRotina := ""
+                 cDadosReq := VarInfo("Dados: ",aCab)
 
                  If (nPos := aScan(aCab, {|x| x[01] == "A3_COD"})) > 0
                     cDcRotina += "Codigo " + AllTrim(aCab[nPos][02]) + " "
@@ -558,6 +562,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
             Case cIDRot == "MATA070"
                  cTpRotina := "OPERADOR"
                  cDcRotina := ""
+                 cDadosReq := VarInfo("Dados: ",aCab)
 
                  If (nPos := aScan(aCab, {|x| x[01] == "A6_COD"})) > 0
                     cDcRotina += "Codigo " + AllTrim(aCab[nPos][02]) + " "
@@ -574,6 +579,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
             Case cIDRot == "LOJA070"
                  cTpRotina := "ADMINISTRADORAS FINANCEIRAS"
                  cDcRotina := ""
+                 cDadosReq := ""
 
                  If (nPos := aScan(aCab, {|x| x[01] == "AE_COD"})) > 0
                     cDcRotina += "Codigo " + AllTrim(aCab[nPos][02]) + " "
@@ -608,6 +614,8 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
 
                  If Empty(cLog)
                     aAdd(aItens, aClone(aItem1))
+
+                    cDadosReq := VarInfo("Cabecalho: ",aCab) + cCRLF + VarInfo("Itens: ",aItens)
                  
                     MsExecAuto({|a,b,c| LOJA070(a,b,c)}, aCab, aItens, nOpcao)
                  EndIf
@@ -621,6 +629,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
 		   	    // -----------------------------------------
                  cTpRotina := "VENDAS"
                  cLog      := ""
+                 cDadosReq := ""
 				     aItens    := {}
                  aParcela  := {}
                  aAuditor  := {}
@@ -761,6 +770,8 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
                              cLog := "Venda já cadastrada: Serie - " + AllTrim(cSerie) + " Cupom - " + AllTrim(cCupom) +;
                                      " PDV - " + AllTrim(cPDV)
                            else 
+                             cDadosReq := VarInfo("Cabecalho: ",aCab) + cCRLF + VarInfo("Itens: ",aItens)
+
                              MSExecAuto({|a,b,c,d,e,f,g,h,i,j| Loja701(a,b,c,d,e,f,g,h,i,j)},.F.,3,"","",{},aCab,aItens,aParcela,.F.,.T.)
 
                              If ! lMsErroAuto
@@ -792,7 +803,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
 
                                    While ! QSL1->(Eof())
                                       If QSL1->L2RECNO > 0
-                                        If (nPos := aScan(aAuditor, {|x| x[02] == QSL1->L2_ITEM})) > 0
+                                        If (nPos := aScan(aAuditor, {|x| AllTrim(x[02]) == AllTrim(QSL1->L2_ITEM)})) > 0
                                            SL2->(dbGoto(QSL1->L2RECNO))
 
                                            Reclock("SL2",.F.)
@@ -817,6 +828,10 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
                                      cLog := "Venda ainda não processada: Serie - " + AllTrim(cSerie) + " Cupom - " +;
                                              AllTrim(cCupom) + " PDV - " + AllTrim(cPDV)
                                    else
+                                     cDadosReq := "Cancelamneto CUPOM: " + AllTrim(SL1->L1_FILIAL) + " / " +;
+                                                  AllTrim(SL1->L1_NUM) + " / " + AllTrim(SL1->L1_OPERADO) +;
+                                                  " / " + AllTrim(SL1->L1_DOC) + " / " + SL1->L1_SERIE
+
                                      CANCUPOM(SL1->L1_FILIAL, SL1->L1_NUM, SL1->L1_OPERADO, SL1->L1_DOC, SL1->L1_SERIE, @cLog)
                                   EndIf   
                                 else
@@ -834,6 +849,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
                  lMsErroAuto := .F.
                  aRegSE5     := {}
                  cDcRotina   := ""
+                 cDadosReq   := ""
 
                  If (nPos := aScan(aCab, {|x| x[01] == "CBCOORIG"})) > 0
                     cDcRotina += "Banco Origem " + AllTrim(aCab[nPos][02]) + " "
@@ -859,6 +875,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
                     Next
 
                     dDataBase := aCab[14][02]
+                    cDadosReq := VarInfo("Dados: ",aRegSE5)
                     
                     FWSM0Util():setSM0PositionBycFilAnt()       // Método estático que posiciona a SM0 de acordo: cEmpAnt e cFilAnt
 
@@ -871,6 +888,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
            // -------------------------------
             Case cIDRot == "INUTILIZAR"
                  cTpRotina := "INUTILIZACAO CUPOM"
+                 cDadosReq := ""
 
                  If (nPos := aScan(aCab, {|x| AllTrim(x[01]) == "LX_CUPOM"})) > 0
                     cCupom := AllTrim(aCab[nPos][02])
@@ -893,7 +911,9 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
 
                  If ! QSLX->(Eof())
                     cLog := "ATENÇÃO - Inutilização já realizada."
-                  else 
+                  else
+                    cDadosReq := VarInfo("Inutilização: ",aCab)
+
                     Reclock("SLX",.T.)
                       Replace SLX->LX_FILIAL with FWxFilial("SLX")
                       Replace SLX->LX_TPCANC with "X"
@@ -911,6 +931,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
 			   Case cIDRot == "MATA103"
                  cTpRotina := "DOCUMENTO DE ENTRADA"
                  cLog      := ""
+                 cDadosReq := ""
 
                  If nOpcao <> 3 .and. nOpcao <> 5
                     cLog := "ERRO: Opção inválida para essa rotina." 
@@ -958,6 +979,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
                 
 			              aRegSD1     := aItem1
                        lMsErroAuto := .F.
+                       cDadosReq := VarInfo("Cabecalho: ",aCab) + cCRLF + VarInfo("Itens: ",aRegSD1)
 
                        MsExecAuto({|x,y,z| MATA103(x,y,z)},aCab,aRegSD1,nOpcao)
                       
@@ -1024,6 +1046,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
 			   Case cIDRot == "LOJR130"
                  cTpRotina := "Nfe x Cupom"
                  cLog      := ""
+                 cDadosReq := ""
                  aCupons   := {}
 
                  If (nPos := aScan(aCab, {|x| x[01] == "F2_SERIE"})) > 0
@@ -1108,6 +1131,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
 			   Case cIDRot == "MATA116"
                  cTpRotina := "CT-e Nota Conhecimento de Frete"
                  cLog      := ""
+                 cDadosReq := ""
 
                  If nOpcao <> 1 .and. nOpcao <> 2
                     cLog := "ERRO: Opção inválida para essa rotina." 
@@ -1141,6 +1165,8 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
                                 aAdd(aItens, {aItem1[nY]})
                             Next    
 
+                            cDadosReq := VarInfo("Cabecalho: ",aCab) + cCRLF + VarInfo("Itens: ",aItens)
+                            
                             MATA116(aCab,aItens,,,aItem2)
                            
                             If ! lMsErroAuto
@@ -1244,6 +1270,7 @@ Static Function fnR01Grv(oJson, cJson, cMensag)
            Replace SZ1->Z1_MENSAG  with IIf(Empty(cLog),"SUCESSO",IIf(lMsErroAuto .and. ! lMVC,NoAcento(cLog),cLog))
            Replace SZ1->Z1_STATUS  with IIf(Empty(cLog),"S","E")
            Replace SZ1->Z1_ARQJSON with cArqJson
+           Replace SZ1->Z1_DADOS   with cDadosReq
          SZ1->(MsUnlock())
 
 			ConfirmSX8()
@@ -1549,7 +1576,12 @@ Static Function fnR01Dad(oSubItReq)
              If (nPos := aScan(aStruc, {|x| AttIsMemberOf(oData[nY], Upper(AllTrim(x[01])))})) > 0
                 cCampo := Lower(aStruc[nPos][01])
                 cValor := &("oData[nY]:" + AllTrim(cCampo))
-                xValor := fnR01MCp(cCampo, cValor, aStruc[nPos][02], aStruc[nPos][03])    
+
+                If AllTrim(aStruc[nPos][01]) == "L4_DATATEF"
+                   xValor := DToS(CToD(cValor))
+                 else  
+                   xValor := fnR01MCp(cCampo, cValor, aStruc[nPos][02], aStruc[nPos][03])    
+                EndIf
 
                 aAdd(aAux, {Upper(cCampo),;    // 01 - Nome do campo
                             xValor,;           // 02 - Conteúdo do campo
@@ -1606,15 +1638,15 @@ Static Function fnR01MCp(cCampo, xValor, cTipDad, nTamanho)
     // -------------------------
   	 Case (! Empty(cTipDad) .and. cTipDad == "N") .or. (Len(aGetCmp) == 2 .and. TamSX3(cCampo)[03] == "N")
           Do Case
-			       Case ValType(xValor) == "C"			
-				          xValor    := StrTran(xValor,",",".")				
-				          xConverte := Val(xValor)
+			    Case ValType(xValor) == "C"			
+				      xValor    := StrTran(xValor,",",".")				
+				      xConverte := Val(xValor)
 
-			       Case ValType(xValor) == "N"
-				          xConverte := xValor	
+			    Case ValType(xValor) == "N"
+				      xConverte := xValor	
 			
              OtherWise
-				          xConverte := 0
+				      xConverte := 0
 		      EndCase
 
 	// -- Converte para data
